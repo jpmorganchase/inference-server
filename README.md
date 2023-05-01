@@ -1,5 +1,7 @@
 # inference-server
 
+Pluggable Python HTTP web service (WSGI) for real-time AI/ML model inference compatible with Amazon SageMaker.
+
 :blue_book: Documentation: https://inference-server.readthedocs.io
 
 
