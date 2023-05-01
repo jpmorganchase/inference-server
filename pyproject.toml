@@ -1,0 +1,114 @@
+# Copyright 2023 J.P. Morgan Chase & Co.
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+# the License. You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+# specific language governing permissions and limitations under the License.
+
+
+# Project configuration file
+
+[project]
+
+name = "inference-server"
+dynamic = ["version"]
+
+authors = [
+    { name = "J.P. Morgan Chase & Co.", email = "open_source@jpmorgan.com" }
+]
+description = "TODO"
+readme = "README.md"
+license = { file = "LICENSE" }
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Typing :: Typed",
+]
+keywords = [
+    "artificial-intelligence",
+    "http-server",
+    "inference",
+    "jpmorganchase",
+    "machine-learning",
+    "python",
+    "sagemaker",
+    "wsgi-server",
+]
+
+# Minimum supported Python version
+requires-python = ">=3.7"
+# All runtime dependencies that must be packaged, pin major version only.
+dependencies = [
+    "importlib-metadata<4; python_version<'3.8'",
+]
+
+
+[project.urls]
+
+"Homepage" = "https://github.com/jpmorganchase/inference-server"
+"Bug Tracker" = "https://github.com/jpmorganchase/inference-server/issues"
+"Documentation" = "https://inference-server.readthedocs.io"
+"Download" = "https://pypi.python.org/pypi/inference-server"
+"Source Code" = "https://github.com/jpmorganchase/inference-server"
+
+
+[project.optional-dependencies]
+
+docs = [
+    "sphinx"
+]
+testing = [
+    "pytest",
+    "pytest-cov",
+]
+linting = [
+    "black",
+    "flake8",
+    "interrogate",
+    "isort",
+    "mypy",
+    "pre-commit",
+]
+
+
+[build-system]
+
+requires = [
+    "setuptools>=45",
+    "wheel",
+    "setuptools_scm[toml]>=6.2",
+]
+build-backend = "setuptools.build_meta"
+
+
+[tool.setuptools_scm]
+# Section required to populate package version from Git tag
+
+
+[tool.interrogate]
+
+fail-under = 100
+verbose = 2
+color = true
+omit-covered-files = true
+
+
+[tool.coverage.report]
+
+fail_under = 90
+
+
+[tool.black]
+
+line-length = 120
+
+
+[tool.isort]
+
+profile = "black"
