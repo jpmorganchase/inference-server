@@ -9,6 +9,10 @@
 # "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
 # specific language governing permissions and limitations under the License.
 
+"""
+Pluggable Python HTTP web service (WSGI) for real-time AI/ML model inference compatible with Amazon SageMaker
+"""
+
 try:
     from importlib import metadata
 except ImportError:  # pragma: no cover
