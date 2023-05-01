@@ -13,11 +13,107 @@
 Pluggable Python HTTP web service (WSGI) for real-time AI/ML model inference compatible with Amazon SageMaker
 """
 
+import functools
+import http
+import logging
+from typing import TYPE_CHECKING
+
+import werkzeug
+import werkzeug.exceptions
+from werkzeug.datastructures import MIMEAccept
+
+import inference_server._plugin
+from inference_server._plugin import hook as plugin_hook
+
+if TYPE_CHECKING:
+    from _typeshed.wsgi import WSGIApplication
+
 try:
     from importlib import metadata
 except ImportError:  # pragma: no cover
     # Python < 3.8
     import importlib_metadata as metadata  # type: ignore
 
+__all__ = (
+    "MIMEAccept",  # Exporting for plugin developers' convenience
+    "create_app",
+    "plugin_hook",
+)
+
 #: Library version, e.g. 1.0.0, taken from Git tags
 __version__ = metadata.version("inference-server")
+
+#: Well known location for model artifacts
+_MODEL_DIR = "/opt/ml/model"
+
+logger = logging.getLogger(__package__)
+
+
+def create_app() -> "WSGIApplication":
+    """Initialize and return the WSGI application"""
+    return _app
+
+
+def warmup() -> None:
+    """Initialize any additional resources upfront"""
+    _model()
+
+
+@werkzeug.Request.application
+def _app(request: werkzeug.Request) -> werkzeug.Response:
+    """Return the WSGI application"""
+    try:
+        route_handler = _ROUTES[(request.method, request.path)]
+    except KeyError:
+        raise werkzeug.exceptions.NotFound()
+    response = route_handler(request)
+    return response
+
+
+def _handle_invocations(request: werkzeug.Request) -> werkzeug.Response:
+    """
+    Handle an incoming inference POST request
+
+    :param request: HTTP request data
+    """
+    pm = inference_server._plugin.manager()
+    # Deserialize HTTP body payload (bytes) into input features
+    data = pm.hook.input_fn(input_data=request.data, content_type=request.content_type)
+    # Then use the model to make a prediction
+    prediction = pm.hook.predict_fn(data=data, model=_model())
+    # Then serialize the data as bytes. This is often (but not necessarily) JSON bytes.
+    prediction_bytes, content_type = pm.hook.output_fn(prediction=prediction, accept=request.accept_mimetypes)
+    return werkzeug.Response(prediction_bytes, mimetype=content_type)
+
+
+def _handle_ping(request: werkzeug.Request) -> werkzeug.Response:
+    """
+    Handle an incoming ping HEAD request
+
+    :param request: HTTP request data
+    """
+    pm = inference_server._plugin.manager()
+    if pm.hook.ping_fn(model=_model()):
+        status = http.HTTPStatus.OK
+    else:
+        status = http.HTTPStatus.SERVICE_UNAVAILABLE
+    return werkzeug.Response(status=status)
+
+
+# Stupidly simple request routing
+_ROUTES = {
+    ("POST", "/invocations"): _handle_invocations,
+    ("GET", "/ping"): _handle_ping,
+}
+
+
+@functools.lru_cache(maxsize=None)
+def _model() -> inference_server._plugin.ModelType:
+    """
+    Load a previously serialized ML model from a given filesystem directory
+    """
+    pm = inference_server._plugin.manager()
+    logger.info("Loading model using 'model_fn' hook...")
+    model = pm.hook.model_fn(model_dir=_MODEL_DIR)
+    logger.info("Finished loading model %s", model)
+    return model
