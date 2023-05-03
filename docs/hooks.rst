@@ -100,8 +100,8 @@ With the shipping forecast model that would require the following :func:`input_f
        return orjson.loads(input_data)["location"]
 
 Bear in mind that this a fairly naive implementation of course as it does not apply any input validation on the payload
-or the content type. Here we use a fast JSON serializer mod:`orjson` which natively serializes to and from bytes instead
-of string objects.
+or the content type. Here we use a fast JSON serializer :mod:`orjson` which natively serializes to and from bytes
+instead of string objects.
 
 In this example, the predictions should be returned using the following JSON structure:
 

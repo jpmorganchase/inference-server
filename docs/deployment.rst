@@ -49,7 +49,7 @@ Configuring Gunicorn HTTP server
 --------------------------------
 
 For a typical deployment, we may need to configure additional Gunicorn options. Instead of adding command line options
-one by one, we could simply specify all options in a single configuration file.argument
+one by one, we could simply specify all options in a single configuration file.
 
 Create :file:`conf.py` with the following content::
 
