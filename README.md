@@ -1,6 +1,6 @@
 # inference-server
 
-Pluggable Python HTTP web service (WSGI) for real-time AI/ML model inference compatible with Amazon SageMaker.
+Deploy your AI/ML model to Amazon SageMaker for real-time inference using your own Docker container image.
 
 :blue_book: Documentation: https://inference-server.readthedocs.io
 
