@@ -3,7 +3,7 @@
 Implementing server hooks
 =========================
 
-This pages explains how to implement the **inference-server** hooks to deploy a model to Amazon SageMaker.
+This page explains how to implement the **inference-server** hooks to deploy a model to Amazon SageMaker.
 
 
 Hook definitions
