@@ -10,6 +10,7 @@ Deploy your AI/ML model to Amazon SageMaker for real-time inference using your o
    introduction
    hooks
    deployment
+   testing
    modules
 
 
