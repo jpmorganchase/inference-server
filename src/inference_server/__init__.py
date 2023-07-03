@@ -18,6 +18,7 @@ import http
 import logging
 from typing import TYPE_CHECKING
 
+import codetiming
 import werkzeug
 import werkzeug.exceptions
 from werkzeug.datastructures import MIMEAccept
@@ -76,14 +77,15 @@ def _handle_invocations(request: werkzeug.Request) -> werkzeug.Response:
 
     :param request: HTTP request data
     """
-    pm = inference_server._plugin.manager()
-    # Deserialize HTTP body payload (bytes) into input features
-    data = pm.hook.input_fn(input_data=request.data, content_type=request.content_type)
-    # Then use the model to make a prediction
-    prediction = pm.hook.predict_fn(data=data, model=_model())
-    # Then serialize the data as bytes. This is often (but not necessarily) JSON bytes.
-    prediction_bytes, content_type = pm.hook.output_fn(prediction=prediction, accept=request.accept_mimetypes)
-    return werkzeug.Response(prediction_bytes, mimetype=content_type)
+    with codetiming.Timer(text="Invocation took {:.3f} seconds", logger=logger.debug):
+        pm = inference_server._plugin.manager()
+        # Deserialize HTTP body payload (bytes) into input features
+        data = pm.hook.input_fn(input_data=request.data, content_type=request.content_type)
+        # Then use the model to make a prediction
+        prediction = pm.hook.predict_fn(data=data, model=_model())
+        # Then serialize the data as bytes. This is often (but not necessarily) JSON bytes.
+        prediction_bytes, content_type = pm.hook.output_fn(prediction=prediction, accept=request.accept_mimetypes)
+        return werkzeug.Response(prediction_bytes, mimetype=content_type)
 
 
 def _handle_ping(request: werkzeug.Request) -> werkzeug.Response:
