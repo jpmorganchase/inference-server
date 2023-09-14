@@ -35,7 +35,10 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.napoleon",
     "sphinx.ext.viewcode",
+    "sphinx_rtd_theme",
 ]
+
+html_theme = "sphinx_rtd_theme"
 
 add_module_names = False
 
