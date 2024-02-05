@@ -19,11 +19,12 @@ import logging
 from typing import TYPE_CHECKING
 
 import codetiming
-import inference_server._plugin
 import werkzeug
 import werkzeug.exceptions
-from inference_server._plugin import hook as plugin_hook
 from werkzeug.datastructures import MIMEAccept
+
+import inference_server._plugin
+from inference_server._plugin import hook as plugin_hook
 
 if TYPE_CHECKING:
     from _typeshed.wsgi import WSGIApplication
