@@ -113,7 +113,7 @@ def _handle_execution_parameters(request: werkzeug.Request):
     return {
         "BatchStrategy": pm.hook.batch_strategy_fn(),
         "MaxConcurrentTransforms": pm.hook.max_concurrent_transforms_fn(),
-        "MaxPayloadInMB": pm.hook.max_payload_in_mb_fn()
+        "MaxPayloadInMB": pm.hook.max_payload_in_mb_fn(),
     }
 
 
