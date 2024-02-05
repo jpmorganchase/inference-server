@@ -114,6 +114,34 @@ def output_fn(prediction: PredictionType, accept: werkzeug.datastructures.MIMEAc
     raise NotImplementedError
 
 
+@hookspec(firstresult=True)
+def batch_strategy_fn() -> str:
+    """
+    A function to specify whether to send one or many record(s) when BatchTransform job makes an HTTP invocation request
+
+    Valid Values: "MultiRecord" or "SingleRecord"
+    """
+    raise NotImplementedError
+
+
+@hookspec(firstresult=True)
+def max_concurrent_transforms_fn() -> int:
+    """
+    A function to return maximum number of parallel requests that can be sent to each service in a transform job.
+    """
+    raise NotImplementedError
+
+
+@hookspec(firstresult=True)
+def max_payload_in_mb_fn() -> int:
+    """
+    A function to return the maximum allowed size in MB of the payload.
+
+    The value of max_payload_in_mb() * max_concurrent_transforms() cannot exceed 100 MB.
+    """
+    raise NotImplementedError
+
+
 @functools.lru_cache(maxsize=None)
 def manager() -> pluggy.PluginManager:
     """

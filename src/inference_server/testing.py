@@ -78,3 +78,14 @@ def hookimpl_is_valid(function: Callable) -> bool:
     except AttributeError:
         return False
     return function in (impl.function for impl in hook.get_hookimpls())
+
+
+def batch_strategy_fn_is_valid() -> bool:
+    batch_strategy = plugin_manager().hook.batch_strategy_fn()
+    return batch_strategy == "SingleRecord" or batch_strategy == "MultiRecord"
+
+
+def max_payload_max_concurrent_is_valid() -> bool:
+    max_concurrent_transforms = plugin_manager().hook.max_concurrent_transforms_fn()
+    max_payload_in_mb = plugin_manager().hook.max_payload_in_mb_fn()
+    return max_concurrent_transforms * max_payload_in_mb <= 100

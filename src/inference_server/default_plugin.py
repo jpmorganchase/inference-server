@@ -81,3 +81,27 @@ def output_fn(prediction: bytes, accept: werkzeug.datastructures.MIMEAccept) -> 
     :param accept:     MIME types requested/accepted by the client, e.g. ``application/json``
     """
     return prediction, "application/octet-stream"
+
+
+@inference_server.plugin_hook(trylast=True)
+def batch_strategy_fn() -> str:
+    """
+    Return Batch Transform processing strategy.
+    """
+    return "MultiRecord"
+
+
+@inference_server.plugin_hook(trylast=True)
+def max_concurrent_transforms_fn() -> int:
+    """
+    Return maximum number of parallel requests.
+    """
+    return 1
+
+
+@inference_server.plugin_hook(trylast=True)
+def max_payload_in_mb_fn() -> int:
+    """
+    Return the maximum allowed size in MB of the payload.
+    """
+    return 6

@@ -19,12 +19,11 @@ import logging
 from typing import TYPE_CHECKING
 
 import codetiming
+import inference_server._plugin
 import werkzeug
 import werkzeug.exceptions
-from werkzeug.datastructures import MIMEAccept
-
-import inference_server._plugin
 from inference_server._plugin import hook as plugin_hook
+from werkzeug.datastructures import MIMEAccept
 
 if TYPE_CHECKING:
     from _typeshed.wsgi import WSGIApplication
@@ -102,8 +101,24 @@ def _handle_ping(request: werkzeug.Request) -> werkzeug.Response:
     return werkzeug.Response(status=status)
 
 
+def _handle_execution_parameters(request: werkzeug.Request):
+    """
+    Handle an incoming execution-parameters GET request
+
+    This will enable BatchTransform job to choose the optimal tuning parameters during runtime.
+    :param request: HTTP request data
+    """
+    pm = inference_server._plugin.manager()
+    return {
+        "BatchStrategy": pm.hook.batch_strategy_fn(),
+        "MaxConcurrentTransforms": pm.hook.max_concurrent_transforms_fn(),
+        "MaxPayloadInMB": pm.hook.max_payload_in_mb_fn()
+    }
+
+
 # Stupidly simple request routing
 _ROUTES = {
+    ("GET", "/execution-parameters"): _handle_execution_parameters,
     ("POST", "/invocations"): _handle_invocations,
     ("GET", "/ping"): _handle_ping,
 }
