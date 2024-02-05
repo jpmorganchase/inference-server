@@ -9,6 +9,8 @@
 # "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
 # specific language governing permissions and limitations under the License.
 
+import uuid
+
 import pytest
 
 import inference_server
@@ -60,6 +62,15 @@ def test_ping_unhealthy(client, bad_ping):
     assert response.data == b""
 
 
+def test_warmup():
+    assert inference_server.warmup() is None
+
+
+def test_path_not_found(client):
+    response = client.get(f"/{uuid.uuid4()}")
+    assert response.status_code == 404
+
+
 def test_invocations():
     # Test the default plugin which should just pass through any input bytes
     data = b"What's the shipping forecast for tomorrow"
@@ -68,8 +79,17 @@ def test_invocations():
     assert response.headers["Content-Type"] == "application/octet-stream"
 
 
+def test_execution_parameters(client):
+    response = client.get("/execution-parameters")
+    assert response.data == b'{"BatchStrategy": "MultiRecord", "MaxConcurrentTransforms": 1, "MaxPayloadInMB": 6}'
+
+
 def test_default_plugin_registered():
     assert inference_server.testing.plugin_is_registered(inference_server.default_plugin)
+
+
+def test_invalid_hookimpl_fn():
+    assert not inference_server.testing.hookimpl_is_valid(lambda x: x)
 
 
 def test_default_model_fn_hook_is_valid():

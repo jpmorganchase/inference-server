@@ -15,6 +15,7 @@ Pluggable Python HTTP web service (WSGI) for real-time AI/ML model inference com
 
 import functools
 import http
+import json
 import logging
 from typing import TYPE_CHECKING
 
@@ -110,11 +111,16 @@ def _handle_execution_parameters(request: werkzeug.Request):
     :param request: HTTP request data
     """
     pm = inference_server._plugin.manager()
-    return {
-        "BatchStrategy": pm.hook.batch_strategy_fn(),
-        "MaxConcurrentTransforms": pm.hook.max_concurrent_transforms_fn(),
-        "MaxPayloadInMB": pm.hook.max_payload_in_mb_fn(),
-    }
+    return werkzeug.Response(
+        json.dumps(
+            {
+                "BatchStrategy": pm.hook.batch_strategy_fn(),
+                "MaxConcurrentTransforms": pm.hook.max_concurrent_transforms_fn(),
+                "MaxPayloadInMB": pm.hook.max_payload_in_mb_fn(),
+            }
+        ),
+        mimetype="application/json",
+    )
 
 
 # Stupidly simple request routing
