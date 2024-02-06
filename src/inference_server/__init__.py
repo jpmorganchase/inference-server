@@ -111,16 +111,12 @@ def _handle_execution_parameters(request: werkzeug.Request):
     :param request: HTTP request data
     """
     pm = inference_server._plugin.manager()
-    return werkzeug.Response(
-        json.dumps(
-            {
-                "BatchStrategy": pm.hook.batch_strategy(),
-                "MaxConcurrentTransforms": pm.hook.max_concurrent_transforms(),
-                "MaxPayloadInMB": pm.hook.max_payload_in_mb(),
-            }
-        ),
-        mimetype="application/json",
-    )
+    response_data = {
+        "BatchStrategy": pm.hook.batch_strategy(),
+        "MaxConcurrentTransforms": pm.hook.max_concurrent_transforms(),
+        "MaxPayloadInMB": pm.hook.max_payload_in_mb(),
+    }
+    return werkzeug.Response(json.dumps(response_data), mimetype="application/json")
 
 
 # Stupidly simple request routing
