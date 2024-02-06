@@ -120,7 +120,14 @@ def output_fn(prediction: PredictionType, accept: werkzeug.datastructures.MIMEAc
 @hookspec(firstresult=True)
 def batch_strategy() -> "inference_server.BatchStrategy":
     """
-    A function to specify whether to send one or many record(s) when BatchTransform job makes an HTTP invocation request
+    Return the default Batch Transform invocation strategy for this model
+
+    Default: :attr:`inference_server.BatchStrategy.MULTI_RECORD`
+
+    If users do not specify a strategy when creating a Batch Transform job, the strategy returned by this hook will be
+    used.
+
+    A model may support one or multiple invocation strategies depending on its implementation of the server hooks.
     """
     raise NotImplementedError
 
@@ -128,7 +135,12 @@ def batch_strategy() -> "inference_server.BatchStrategy":
 @hookspec(firstresult=True)
 def max_concurrent_transforms() -> int:
     """
-    A function to return maximum number of parallel requests that can be sent to each service in a transform job.
+    Return the optimal maximum number of concurrent invocations for this model
+
+    Default: ``1``
+
+    If users do not specify a maximum number of concurrent transforms when creating a Batch Transform job, the value
+    returned by this hook will be used.
     """
     raise NotImplementedError
 
@@ -136,9 +148,11 @@ def max_concurrent_transforms() -> int:
 @hookspec(firstresult=True)
 def max_payload_in_mb() -> int:
     """
-    A function to return the maximum allowed size in MB of the payload.
+    Return the maximum allowed size in MB of a single record submitted by a Batch Transform job to the model
 
-    The value of max_payload_in_mb() * max_concurrent_transforms() cannot exceed 100 MB.
+    Default: ``6`` (MB)
+
+    The value of :func:`max_payload_in_mb` × :func:`max_concurrent_transforms` should be ≤ 100 MB.
     """
     raise NotImplementedError
 
