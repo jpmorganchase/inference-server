@@ -20,7 +20,7 @@ dynamic = ["version"]
 authors = [
     { name = "J.P. Morgan Chase & Co.", email = "open_source@jpmorgan.com" }
 ]
-description = "Deploy your AI/ML model to Amazon SageMaker for real-time inference using your own Docker container image."
+description = "Deploy your AI/ML model to Amazon SageMaker for Real-Time Inference and Batch Transform using your own Docker container image."
 readme = "README.md"
 license = { file = "LICENSE" }
 classifiers = [
