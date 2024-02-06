@@ -80,16 +80,16 @@ def hookimpl_is_valid(function: Callable) -> bool:
     return function in (impl.function for impl in hook.get_hookimpls())
 
 
-def batch_strategy_fn_is_valid() -> bool:
-    """Return whether batch_strategy_fn is valid"""
-    batch_strategy = plugin_manager().hook.batch_strategy_fn()
+def batch_strategy_is_valid() -> bool:
+    """Return whether batch_strategy is valid"""
+    batch_strategy = plugin_manager().hook.batch_strategy()
     return batch_strategy == "SingleRecord" or batch_strategy == "MultiRecord"
 
 
 def max_payload_max_concurrent_is_valid() -> bool:
-    """Return whether values for max_concurrent_transforms_fn and max_payload_in_mb_fn are valid"""
-    max_concurrent_transforms = plugin_manager().hook.max_concurrent_transforms_fn()
-    max_payload_in_mb = plugin_manager().hook.max_payload_in_mb_fn()
+    """Return whether values for max_concurrent_transforms and max_payload_in_mb are valid"""
+    max_concurrent_transforms = plugin_manager().hook.max_concurrent_transforms()
+    max_payload_in_mb = plugin_manager().hook.max_payload_in_mb()
     if max_concurrent_transforms < 0 or max_payload_in_mb < 0:
         return False
     else:

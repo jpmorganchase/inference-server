@@ -84,7 +84,7 @@ def output_fn(prediction: bytes, accept: werkzeug.datastructures.MIMEAccept) -> 
 
 
 @inference_server.plugin_hook(trylast=True)
-def batch_strategy_fn() -> str:
+def batch_strategy() -> str:
     """
     Return Batch Transform processing strategy.
     """
@@ -92,7 +92,7 @@ def batch_strategy_fn() -> str:
 
 
 @inference_server.plugin_hook(trylast=True)
-def max_concurrent_transforms_fn() -> int:
+def max_concurrent_transforms() -> int:
     """
     Return maximum number of parallel requests.
     """
@@ -100,7 +100,7 @@ def max_concurrent_transforms_fn() -> int:
 
 
 @inference_server.plugin_hook(trylast=True)
-def max_payload_in_mb_fn() -> int:
+def max_payload_in_mb() -> int:
     """
     Return the maximum allowed size in MB of the payload.
     """

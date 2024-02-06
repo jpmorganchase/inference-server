@@ -108,20 +108,20 @@ def test_default_output_fn_hook_is_valid():
     assert inference_server.testing.hookimpl_is_valid(inference_server.default_plugin.output_fn)
 
 
-def test_default_batch_strategy_fn_hook_is_valid():
-    assert inference_server.testing.hookimpl_is_valid(inference_server.default_plugin.batch_strategy_fn)
+def test_default_batch_strategy_hook_is_valid():
+    assert inference_server.testing.hookimpl_is_valid(inference_server.default_plugin.batch_strategy)
 
 
-def test_default_max_concurrent_transforms_fn_hook_is_valid():
-    assert inference_server.testing.hookimpl_is_valid(inference_server.default_plugin.max_concurrent_transforms_fn)
+def test_default_max_concurrent_transforms_hook_is_valid():
+    assert inference_server.testing.hookimpl_is_valid(inference_server.default_plugin.max_concurrent_transforms)
 
 
-def test_default_max_payload_in_mb_fn_hook_is_valid():
-    assert inference_server.testing.hookimpl_is_valid(inference_server.default_plugin.max_payload_in_mb_fn)
+def test_default_max_payload_in_mb_hook_is_valid():
+    assert inference_server.testing.hookimpl_is_valid(inference_server.default_plugin.max_payload_in_mb)
 
 
-def test_default_batch_strategy_fn_is_valid():
-    assert inference_server.testing.batch_strategy_fn_is_valid()
+def test_default_batch_strategy_is_valid():
+    assert inference_server.testing.batch_strategy_is_valid()
 
 
 def test_default_max_payload_max_concurrent_is_valid():

@@ -114,9 +114,9 @@ def _handle_execution_parameters(request: werkzeug.Request):
     return werkzeug.Response(
         json.dumps(
             {
-                "BatchStrategy": pm.hook.batch_strategy_fn(),
-                "MaxConcurrentTransforms": pm.hook.max_concurrent_transforms_fn(),
-                "MaxPayloadInMB": pm.hook.max_payload_in_mb_fn(),
+                "BatchStrategy": pm.hook.batch_strategy(),
+                "MaxConcurrentTransforms": pm.hook.max_concurrent_transforms(),
+                "MaxPayloadInMB": pm.hook.max_payload_in_mb(),
             }
         ),
         mimetype="application/json",

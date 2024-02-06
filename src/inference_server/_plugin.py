@@ -115,7 +115,7 @@ def output_fn(prediction: PredictionType, accept: werkzeug.datastructures.MIMEAc
 
 
 @hookspec(firstresult=True)
-def batch_strategy_fn() -> str:
+def batch_strategy() -> str:
     """
     A function to specify whether to send one or many record(s) when BatchTransform job makes an HTTP invocation request
 
@@ -125,7 +125,7 @@ def batch_strategy_fn() -> str:
 
 
 @hookspec(firstresult=True)
-def max_concurrent_transforms_fn() -> int:
+def max_concurrent_transforms() -> int:
     """
     A function to return maximum number of parallel requests that can be sent to each service in a transform job.
     """
@@ -133,7 +133,7 @@ def max_concurrent_transforms_fn() -> int:
 
 
 @hookspec(firstresult=True)
-def max_payload_in_mb_fn() -> int:
+def max_payload_in_mb() -> int:
     """
     A function to return the maximum allowed size in MB of the payload.
 
