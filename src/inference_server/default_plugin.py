@@ -84,11 +84,11 @@ def output_fn(prediction: bytes, accept: werkzeug.datastructures.MIMEAccept) -> 
 
 
 @inference_server.plugin_hook(trylast=True)
-def batch_strategy() -> str:
+def batch_strategy() -> inference_server.BatchStrategy:
     """
     Return Batch Transform processing strategy.
     """
-    return "MultiRecord"
+    return inference_server.BatchStrategy.MULTI_RECORD
 
 
 @inference_server.plugin_hook(trylast=True)

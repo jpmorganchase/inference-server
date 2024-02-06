@@ -13,6 +13,7 @@
 Pluggable Python HTTP web service (WSGI) for real-time AI/ML model inference compatible with Amazon SageMaker
 """
 
+import enum
 import functools
 import http
 import logging
@@ -37,6 +38,7 @@ except ImportError:  # pragma: no cover
     import importlib_metadata as metadata  # type: ignore
 
 __all__ = (
+    "BatchStrategy",
     "MIMEAccept",  # Exporting for plugin developers' convenience
     "create_app",
     "plugin_hook",
@@ -49,6 +51,20 @@ __version__ = metadata.version("inference-server")
 _MODEL_DIR = "/opt/ml/model"
 
 logger = logging.getLogger(__package__)
+
+
+class BatchStrategy(enum.Enum):
+    """
+    Batch Transform invocation strategy
+
+    Specifies the number of records to include in a mini-batch for an HTTP inference request. A record is a single unit
+    of input data that inference can be made on. For example, a single line in a CSV file is a record.
+
+    See: https://docs.aws.amazon.com/sagemaker/latest/APIReference/API_CreateTransformJob.html#sagemaker-CreateTransformJob-request-BatchStrategy
+    """  # noqa: E501
+
+    SINGLE_RECORD = "SingleRecord"
+    MULTI_RECORD = "MultiRecord"
 
 
 def create_app() -> "WSGIApplication":

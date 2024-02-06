@@ -18,10 +18,13 @@ Hook definitions adapted from https://docs.aws.amazon.com/sagemaker/latest/dg/ad
 import functools
 import logging
 import sys
-from typing import Any, Tuple
+from typing import TYPE_CHECKING, Any, Tuple
 
 import pluggy
 import werkzeug.datastructures
+
+if TYPE_CHECKING:
+    import inference_server
 
 ModelType = Any
 DataType = Any
@@ -115,11 +118,9 @@ def output_fn(prediction: PredictionType, accept: werkzeug.datastructures.MIMEAc
 
 
 @hookspec(firstresult=True)
-def batch_strategy() -> str:
+def batch_strategy() -> "inference_server.BatchStrategy":
     """
     A function to specify whether to send one or many record(s) when BatchTransform job makes an HTTP invocation request
-
-    Valid Values: "MultiRecord" or "SingleRecord"
     """
     raise NotImplementedError
 
