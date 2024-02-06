@@ -55,7 +55,7 @@ logger = logging.getLogger(__package__)
 
 class BatchStrategy(enum.Enum):
     """
-    Batch Transform invocation strategy
+    Enumeration of Batch Transform invocation strategies
 
     Specifies the number of records to include in a mini-batch for an HTTP inference request. A record is a single unit
     of input data that inference can be made on. For example, a single line in a CSV file is a record.
@@ -63,7 +63,9 @@ class BatchStrategy(enum.Enum):
     See: https://docs.aws.amazon.com/sagemaker/latest/APIReference/API_CreateTransformJob.html#sagemaker-CreateTransformJob-request-BatchStrategy
     """  # noqa: E501
 
+    #: Batch Transform job to invoke the model with a single record per request
     SINGLE_RECORD = "SingleRecord"
+    #: Batch Transform job to invoke the model with multiple records per request
     MULTI_RECORD = "MultiRecord"
 
 
