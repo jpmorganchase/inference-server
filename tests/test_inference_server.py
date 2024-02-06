@@ -9,8 +9,6 @@
 # "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
 # specific language governing permissions and limitations under the License.
 
-import uuid
-
 import pytest
 
 import inference_server
@@ -67,7 +65,7 @@ def test_warmup():
 
 
 def test_path_not_found(client):
-    response = client.get(f"/{uuid.uuid4()}")
+    response = client.get("/this-endpoint-does-not-exist")
     assert response.status_code == 404
 
 
