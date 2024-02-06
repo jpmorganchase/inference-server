@@ -25,11 +25,6 @@ A 5th hook is available to implement custom health-checks if required:
 
 .. autofunction:: ping_fn
 
-The following 3 hooks can be used to implement optimal parameters in runtime when model can be used for
-Batch Transform jobs
-.. autofunction:: batch_strategy
-.. autofunction:: max_concurrent_transforms
-.. autofunction:: max_payload_in_mb
 
 Implementing model hooks
 -------------------------
