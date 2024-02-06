@@ -18,10 +18,13 @@ Hook definitions adapted from https://docs.aws.amazon.com/sagemaker/latest/dg/ad
 import functools
 import logging
 import sys
-from typing import Any, Tuple
+from typing import TYPE_CHECKING, Any, Tuple
 
 import pluggy
 import werkzeug.datastructures
+
+if TYPE_CHECKING:
+    import inference_server
 
 ModelType = Any
 DataType = Any
@@ -110,6 +113,32 @@ def output_fn(prediction: PredictionType, accept: werkzeug.datastructures.MIMEAc
 
     :param prediction: The output from the model as return by :func:`predict_fn`
     :param accept:     MIME type(s) requested/accepted by the client, e.g. ``application/json``
+    """
+    raise NotImplementedError
+
+
+@hookspec(firstresult=True)
+def batch_strategy() -> "inference_server.BatchStrategy":
+    """
+    A function to specify whether to send one or many record(s) when BatchTransform job makes an HTTP invocation request
+    """
+    raise NotImplementedError
+
+
+@hookspec(firstresult=True)
+def max_concurrent_transforms() -> int:
+    """
+    A function to return maximum number of parallel requests that can be sent to each service in a transform job.
+    """
+    raise NotImplementedError
+
+
+@hookspec(firstresult=True)
+def max_payload_in_mb() -> int:
+    """
+    A function to return the maximum allowed size in MB of the payload.
+
+    The value of max_payload_in_mb() * max_concurrent_transforms() cannot exceed 100 MB.
     """
     raise NotImplementedError
 

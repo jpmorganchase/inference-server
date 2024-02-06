@@ -13,12 +13,14 @@
 Pluggable Python HTTP web service (WSGI) for real-time AI/ML model inference compatible with Amazon SageMaker
 """
 
+import enum
 import functools
 import http
 import logging
 from typing import TYPE_CHECKING
 
 import codetiming
+import orjson
 import werkzeug
 import werkzeug.exceptions
 from werkzeug.datastructures import MIMEAccept
@@ -36,6 +38,7 @@ except ImportError:  # pragma: no cover
     import importlib_metadata as metadata  # type: ignore
 
 __all__ = (
+    "BatchStrategy",
     "MIMEAccept",  # Exporting for plugin developers' convenience
     "create_app",
     "plugin_hook",
@@ -48,6 +51,22 @@ __version__ = metadata.version("inference-server")
 _MODEL_DIR = "/opt/ml/model"
 
 logger = logging.getLogger(__package__)
+
+
+class BatchStrategy(enum.Enum):
+    """
+    Enumeration of Batch Transform invocation strategies
+
+    Specifies the number of records to include in a mini-batch for an HTTP inference request. A record is a single unit
+    of input data that inference can be made on. For example, a single line in a CSV file is a record.
+
+    See: https://docs.aws.amazon.com/sagemaker/latest/APIReference/API_CreateTransformJob.html#sagemaker-CreateTransformJob-request-BatchStrategy
+    """  # noqa: E501
+
+    #: Batch Transform job to invoke the model with a single record per request
+    SINGLE_RECORD = "SingleRecord"
+    #: Batch Transform job to invoke the model with multiple records per request
+    MULTI_RECORD = "MultiRecord"
 
 
 def create_app() -> "WSGIApplication":
@@ -102,8 +121,25 @@ def _handle_ping(request: werkzeug.Request) -> werkzeug.Response:
     return werkzeug.Response(status=status)
 
 
+def _handle_execution_parameters(request: werkzeug.Request):
+    """
+    Handle an incoming execution-parameters GET request
+
+    This will enable BatchTransform job to choose the optimal tuning parameters during runtime.
+    :param request: HTTP request data
+    """
+    pm = inference_server._plugin.manager()
+    response_data = {
+        "BatchStrategy": pm.hook.batch_strategy(),
+        "MaxConcurrentTransforms": pm.hook.max_concurrent_transforms(),
+        "MaxPayloadInMB": pm.hook.max_payload_in_mb(),
+    }
+    return werkzeug.Response(orjson.dumps(response_data), mimetype="application/json")
+
+
 # Stupidly simple request routing
 _ROUTES = {
+    ("GET", "/execution-parameters"): _handle_execution_parameters,
     ("POST", "/invocations"): _handle_invocations,
     ("GET", "/ping"): _handle_ping,
 }
