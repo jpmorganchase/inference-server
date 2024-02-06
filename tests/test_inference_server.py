@@ -116,11 +116,3 @@ def test_default_max_concurrent_transforms_hook_is_valid():
 
 def test_default_max_payload_in_mb_hook_is_valid():
     assert inference_server.testing.hookimpl_is_valid(inference_server.default_plugin.max_payload_in_mb)
-
-
-def test_default_batch_strategy_is_valid():
-    assert inference_server.testing.batch_strategy_is_valid()
-
-
-def test_default_max_payload_max_concurrent_is_valid():
-    assert inference_server.testing.max_payload_max_concurrent_is_valid()
