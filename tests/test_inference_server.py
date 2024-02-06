@@ -79,7 +79,7 @@ def test_invocations():
 
 def test_execution_parameters(client):
     response = client.get("/execution-parameters")
-    assert response.data == b'{"BatchStrategy": "MultiRecord", "MaxConcurrentTransforms": 1, "MaxPayloadInMB": 6}'
+    assert response.data == b'{"BatchStrategy":"MultiRecord","MaxConcurrentTransforms":1,"MaxPayloadInMB":6}'
 
 
 def test_default_plugin_registered():

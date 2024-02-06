@@ -15,11 +15,11 @@ Pluggable Python HTTP web service (WSGI) for real-time AI/ML model inference com
 
 import functools
 import http
-import json
 import logging
 from typing import TYPE_CHECKING
 
 import codetiming
+import orjson
 import werkzeug
 import werkzeug.exceptions
 from werkzeug.datastructures import MIMEAccept
@@ -116,7 +116,7 @@ def _handle_execution_parameters(request: werkzeug.Request):
         "MaxConcurrentTransforms": pm.hook.max_concurrent_transforms(),
         "MaxPayloadInMB": pm.hook.max_payload_in_mb(),
     }
-    return werkzeug.Response(json.dumps(response_data), mimetype="application/json")
+    return werkzeug.Response(orjson.dumps(response_data), mimetype="application/json")
 
 
 # Stupidly simple request routing
