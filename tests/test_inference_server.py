@@ -106,6 +106,12 @@ def test_prediction_custom_serializer():
     assert prediction == input_data  # Receive a string
 
 
+def test_prediction_no_serializer():
+    input_data = b"What's the shipping forecast for tomorrow"
+    prediction = inference_server.testing.predict(input_data)  # No serializer should be bytes pass through again
+    assert prediction == input_data
+
+
 def test_execution_parameters(client):
     response = client.get("/execution-parameters")
     assert response.data == b'{"BatchStrategy":"MultiRecord","MaxConcurrentTransforms":1,"MaxPayloadInMB":6}'
