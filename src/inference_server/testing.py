@@ -13,14 +13,62 @@
 Functions for testing **inference-server** plugins
 """
 
+import io
 from types import ModuleType
-from typing import Callable, Type, Union
+from typing import Any, Callable, Protocol, Tuple, Type, Union
 
+import botocore.response
 import pluggy
 import werkzeug.test
 
 import inference_server
 import inference_server._plugin
+
+
+class ImplementsSerialize(Protocol):
+    """Interface compatible with :class:`sagemaker.serializers.BaseSerializer`"""
+
+    @property
+    def CONTENT_TYPE(self) -> str:
+        """The MIME type for the serialized data"""
+
+    def serialize(self, data: Any) -> bytes:
+        """Return the serialized data"""
+
+
+class ImplementsDeserialize(Protocol):
+    """Interface compatible with :class:`sagemaker.deserializers.BaseDeserializer`"""
+
+    @property
+    def ACCEPT(self) -> Tuple[str]:
+        """The content types that are supported by this deserializer"""
+
+    def deserialize(self, stream: "botocore.response.StreamingBody", content_type: str) -> Any:
+        """Return the deserialized data"""
+
+
+def predict(data: Any, serializer: ImplementsSerialize, deserializer: ImplementsDeserialize) -> Any:
+    """
+    Invoke the model and return a prediction
+
+    :param data:         Model input data
+    :param serializer:   A serializer for sending the data as bytes to the model server. Should be compatible with
+                         :class:`sagemaker.serializers.BaseSerializer`.
+    :param deserializer: A deserializer for processing the prediction as sent by the model server. Should be compatible
+                         with :class:`sagemaker.deserializers.BaseDeserializer`.
+    """
+    serialized_data = serializer.serialize(data)
+    http_headers = {
+        "Content-Type": serializer.CONTENT_TYPE,  # The serializer declares the content-type of the input data
+        "Accept": ", ".join(deserializer.ACCEPT),  # The deserializer dictates the content-type of the prediction
+    }
+    prediction_response = post_invocations(data=serialized_data, headers=http_headers)
+    prediction_stream = botocore.response.StreamingBody(
+        raw_stream=io.BytesIO(prediction_response.data),
+        content_length=prediction_response.content_length,
+    )
+    prediction_deserialized = deserializer.deserialize(prediction_stream, content_type=prediction_response.content_type)
+    return prediction_deserialized
 
 
 def client() -> werkzeug.test.Client:
