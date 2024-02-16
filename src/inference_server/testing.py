@@ -17,7 +17,7 @@ import io
 from types import ModuleType
 from typing import Any, Callable, Optional, Protocol, Tuple, Type, Union
 
-import botocore.response
+import botocore.response  # type: ignore[import-untyped]
 import pluggy
 import werkzeug.test
 
