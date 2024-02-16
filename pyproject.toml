@@ -43,7 +43,7 @@ keywords = [
 ]
 
 # Minimum supported Python version
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 # All runtime dependencies that must be packaged, pin major version only.
 dependencies = [
     "codetiming~=1.4",
