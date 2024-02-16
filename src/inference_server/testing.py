@@ -43,7 +43,7 @@ class ImplementsDeserialize(Protocol):
     def ACCEPT(self) -> Tuple[str]:
         """The content types that are supported by this deserializer"""
 
-    def deserialize(self, stream: "botocore.response.StreamingBody", content_type: str) -> Any:
+    def deserialize(self, stream: botocore.response.StreamingBody, content_type: str) -> Any:
         """Return the deserialized data"""
 
 
