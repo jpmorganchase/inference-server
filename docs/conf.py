@@ -46,8 +46,9 @@ autosectionlabel_prefix_document = True
 
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3/", None),
-    "werkzeug": ("https://werkzeug.palletsprojects.com", None),
+    "sagemaker": ("https://sagemaker.readthedocs.io/en/stable/", None),
     "sklearn": ("https://scikit-learn.org/stable/", None),
+    "werkzeug": ("https://werkzeug.palletsprojects.com", None),
 }
 
 # List of patterns, relative to source directory, that match files and
