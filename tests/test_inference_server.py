@@ -9,6 +9,9 @@
 # "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
 # specific language governing permissions and limitations under the License.
 
+from typing import Tuple
+
+import botocore.response
 import pytest
 
 import inference_server
@@ -70,11 +73,46 @@ def test_path_not_found(client):
 
 
 def test_invocations():
-    # Test the default plugin which should just pass through any input bytes
+    """Test the default plugin (which passes through any input bytes) using low-level testing.post_invocations"""
     data = b"What's the shipping forecast for tomorrow"
     response = inference_server.testing.post_invocations(data=data, headers={"Accept": "application/octet-stream"})
     assert response.data == data
     assert response.headers["Content-Type"] == "application/octet-stream"
+
+
+def test_prediction_custom_serializer():
+    """Test the default plugin again, now using high-level testing.predict"""
+
+    class Serializer:
+        @property
+        def CONTENT_TYPE(self) -> str:
+            return "application/octet-stream"
+
+        def serialize(self, data: str) -> bytes:
+            return data.encode()  # Simple str to bytes serializer
+
+    class Deserializer:
+        @property
+        def ACCEPT(self) -> Tuple[str]:
+            return ("application/octet-stream",)
+
+        def deserialize(self, stream: botocore.response.StreamingBody, content_type: str) -> str:
+            assert content_type in self.ACCEPT
+            return stream.read().decode()  # Simple bytes to str deserializer
+
+    input_data = "What's the shipping forecast for tomorrow"  # Simply pass a string
+    prediction = inference_server.testing.predict(
+        data=input_data,
+        serializer=Serializer(),
+        deserializer=Deserializer(),
+    )
+    assert prediction == input_data  # Receive a string
+
+
+def test_prediction_no_serializer():
+    input_data = b"What's the shipping forecast for tomorrow"
+    prediction = inference_server.testing.predict(input_data)  # No serializer should be bytes pass through again
+    assert prediction == input_data
 
 
 def test_execution_parameters(client):

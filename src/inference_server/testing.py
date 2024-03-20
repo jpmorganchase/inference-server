@@ -13,14 +13,98 @@
 Functions for testing **inference-server** plugins
 """
 
+import io
 from types import ModuleType
-from typing import Callable, Type, Union
+from typing import Any, Callable, Optional, Protocol, Tuple, Type, Union
 
+import botocore.response  # type: ignore[import-untyped]
 import pluggy
 import werkzeug.test
 
 import inference_server
 import inference_server._plugin
+
+
+class ImplementsSerialize(Protocol):
+    """Interface compatible with :class:`sagemaker.serializers.BaseSerializer`"""
+
+    @property
+    def CONTENT_TYPE(self) -> str:
+        """The MIME type for the serialized data"""
+
+    def serialize(self, data: Any) -> bytes:
+        """Return the serialized data"""
+
+
+class ImplementsDeserialize(Protocol):
+    """Interface compatible with :class:`sagemaker.deserializers.BaseDeserializer`"""
+
+    @property
+    def ACCEPT(self) -> Tuple[str]:
+        """The content types that are supported by this deserializer"""
+
+    def deserialize(self, stream: botocore.response.StreamingBody, content_type: str) -> Any:
+        """Return the deserialized data"""
+
+
+class _PassThroughSerializer:
+    """Serialize bytes as bytes"""
+
+    @property
+    def CONTENT_TYPE(self) -> str:
+        """The MIME type for the serialized data"""
+        return "application/octet-stream"
+
+    def serialize(self, data: bytes) -> bytes:
+        """Return the serialized data"""
+        assert isinstance(data, bytes)
+        return data
+
+
+class _PassThroughDeserializer:
+    """Deserialize bytes as bytes"""
+
+    @property
+    def ACCEPT(self) -> Tuple[str]:
+        """The content types that are supported by this deserializer"""
+        return ("application/octet-stream",)
+
+    def deserialize(self, stream: "botocore.response.StreamingBody", content_type: str) -> Any:
+        """Return the deserialized data"""
+        assert content_type in self.ACCEPT
+        try:
+            return stream.read()
+        finally:
+            stream.close()
+
+
+def predict(
+    data: Any, serializer: Optional[ImplementsSerialize] = None, deserializer: Optional[ImplementsDeserialize] = None
+) -> Any:
+    """
+    Invoke the model and return a prediction
+
+    :param data:         Model input data
+    :param serializer:   Optional. A serializer for sending the data as bytes to the model server. Should be compatible
+                         with :class:`sagemaker.serializers.BaseSerializer`. Default: bytes pass-through.
+    :param deserializer: Optional. A deserializer for processing the prediction as sent by the model server. Should be
+                         compatible with :class:`sagemaker.deserializers.BaseDeserializer`. Default: bytes pass-through.
+    """
+    serializer = serializer or _PassThroughSerializer()
+    deserializer = deserializer or _PassThroughDeserializer()
+
+    serialized_data = serializer.serialize(data)
+    http_headers = {
+        "Content-Type": serializer.CONTENT_TYPE,  # The serializer declares the content-type of the input data
+        "Accept": ", ".join(deserializer.ACCEPT),  # The deserializer dictates the content-type of the prediction
+    }
+    prediction_response = post_invocations(data=serialized_data, headers=http_headers)
+    prediction_stream = botocore.response.StreamingBody(
+        raw_stream=io.BytesIO(prediction_response.data),
+        content_length=prediction_response.content_length,
+    )
+    prediction_deserialized = deserializer.deserialize(prediction_stream, content_type=prediction_response.content_type)
+    return prediction_deserialized
 
 
 def client() -> werkzeug.test.Client:
