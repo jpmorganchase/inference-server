@@ -36,6 +36,13 @@ For more details see :ref:`deployment:Configuring Gunicorn workers`.
 My model is leaking memory, how do I address that?
 --------------------------------------------------
 
+If the memory leak is outside your control, one approach would be to periodically restart the webserver workers.
+
+For example, when using Gunicorn, it is possible to specify a maximum number of HTTP requests (`max_requests`) after which a given worker should be restarted.
+Gunicorn additionally allows a random offset (`max_requests_jitter`) to be added such that worker restarts are staggered.
+
+For more details see `Gunicorn settings documentation <https://docs.gunicorn.org/en/stable/settings.html#max-requests>`_.
+
 
 How do I invoke my model using a data stream from my favourite message queue system?
 ------------------------------------------------------------------------------------
