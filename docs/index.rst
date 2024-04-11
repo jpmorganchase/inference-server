@@ -4,7 +4,7 @@ inference-server
 Deploy your AI/ML model to Amazon SageMaker for Real-Time Inference and Batch Transform using your own Docker container image.
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Contents
 
    introduction
@@ -12,6 +12,7 @@ Deploy your AI/ML model to Amazon SageMaker for Real-Time Inference and Batch Tr
    batch_transform
    deployment
    testing
+   faq
    modules
 
 
