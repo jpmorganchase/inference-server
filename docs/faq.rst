@@ -23,6 +23,15 @@ For example, when using Gunicorn, this could be done from a post-fork Gunicorn h
 Does **inference-server** support async/ASGI webservers?
 --------------------------------------------------------
 
+No.
+
+**inference-server** is a WSGI application to be used by synchronous webservers.
+
+For most ML models that will be the correct choice as model inference is typically CPU-bound.
+Therefore, a multi-process based WSGI server is a good choice whereby the number of workers is equal to the number of CPU cores available.
+
+For more details see :ref:`deployment:Configuring Gunicorn workers`.
+
 
 My model is leaking memory, how do I address that?
 --------------------------------------------------
