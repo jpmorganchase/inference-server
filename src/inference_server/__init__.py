@@ -42,6 +42,7 @@ __all__ = (
     "MIMEAccept",  # Exporting for plugin developers' convenience
     "create_app",
     "plugin_hook",
+    "warmup",
 )
 
 #: Library version, e.g. 1.0.0, taken from Git tags
@@ -70,12 +71,20 @@ class BatchStrategy(enum.Enum):
 
 
 def create_app() -> "WSGIApplication":
-    """Initialize and return the WSGI application"""
+    """
+    Initialize and return the WSGI application
+
+    This is the WSGI application factory function that needs to be passed to a WSGI-compatible web server.
+    """
     return _app
 
 
 def warmup() -> None:
-    """Initialize any additional resources upfront"""
+    """
+    Initialize any additional resources upfront
+
+    This will call the ``model_fn`` plugin hook.
+    """
     _model()
 
 
