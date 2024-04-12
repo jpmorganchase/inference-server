@@ -1,8 +1,8 @@
-API Documentation
-=================
+API reference documentation
+===========================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    inference_server
    inference_server_testing
