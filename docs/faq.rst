@@ -46,3 +46,14 @@ For more details see `Gunicorn settings documentation <https://docs.gunicorn.org
 
 How do I invoke my model using a data stream from my favourite message queue system?
 ------------------------------------------------------------------------------------
+
+By design, **inference-server** is an HTTP web server and uses a simple request-response model.
+
+This is so it can be deployed in most environments, not only including AWS Sagemaker but also as a local Dockerized service.
+Access to the web server is also possible from a range of environments including AWS itself, but also from other providers in a multi-cloud environment.
+
+Depending on the messaging/queueing system and cloud environment, you have various options to integrate a model deployed with **inference-server** with a message stream.
+
+For example, in AWS, you could deploy a Lambda function which consumes messages from AWS SQS, then send this as an HTTP request to AWS SageMaker.
+Equally, the Lambda function could write the SageMaker response to another SQS queue.
+Of course, instead of a Lambda function you could use any other compute platform to deploy similar logic, including an EKS pods or ECS task.
