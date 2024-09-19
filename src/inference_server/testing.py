@@ -14,11 +14,13 @@ Functions for testing **inference-server** plugins
 """
 
 import io
+import pathlib
 from types import ModuleType
 from typing import Any, Callable, Optional, Protocol, Tuple, Type, Union
 
 import botocore.response  # type: ignore[import-untyped]
 import pluggy
+import pytest
 import werkzeug.test
 
 import inference_server
@@ -79,12 +81,18 @@ class _PassThroughDeserializer:
 
 
 def predict(
-    data: Any, serializer: Optional[ImplementsSerialize] = None, deserializer: Optional[ImplementsDeserialize] = None
+    data: Any,
+    *,
+    model_dir: Optional[pathlib.Path] = None,
+    serializer: Optional[ImplementsSerialize] = None,
+    deserializer: Optional[ImplementsDeserialize] = None,
 ) -> Any:
     """
     Invoke the model and return a prediction
 
     :param data:         Model input data
+    :param model_dir:    Optional pass a custom model directory to load the model from. Default is
+                         :file:`/opt/ml/model/`.
     :param serializer:   Optional. A serializer for sending the data as bytes to the model server. Should be compatible
                          with :class:`sagemaker.serializers.BaseSerializer`. Default: bytes pass-through.
     :param deserializer: Optional. A deserializer for processing the prediction as sent by the model server. Should be
@@ -98,7 +106,7 @@ def predict(
         "Content-Type": serializer.CONTENT_TYPE,  # The serializer declares the content-type of the input data
         "Accept": ", ".join(deserializer.ACCEPT),  # The deserializer dictates the content-type of the prediction
     }
-    prediction_response = post_invocations(data=serialized_data, headers=http_headers)
+    prediction_response = post_invocations(model_dir=model_dir, data=serialized_data, headers=http_headers)
     prediction_stream = botocore.response.StreamingBody(
         raw_stream=io.BytesIO(prediction_response.data),
         content_length=prediction_response.content_length,
@@ -117,15 +125,21 @@ def client() -> werkzeug.test.Client:
     return werkzeug.test.Client(inference_server.create_app())
 
 
-def post_invocations(**kwargs) -> werkzeug.test.TestResponse:
+def post_invocations(*, model_dir: Optional[pathlib.Path] = None, **kwargs) -> werkzeug.test.TestResponse:
     """
     Send an HTTP POST request to ``/invocations`` using a test HTTP client and return the response
 
     This function should be used to verify an inference request using the full **inference-server** logic.
 
-    :param kwargs: Keyword arguments passed to :meth:`werkzeug.test.Client.post`
+    :param model_dir: Optional pass a custom model directory to load the model from. Default is :file:`/opt/ml/model/`.
+    :param kwargs:    Keyword arguments passed to :meth:`werkzeug.test.Client.post`
     """
-    response = client().post("/invocations", **kwargs)
+    # pytest should be available when we are using inference_server.testing
+    with pytest.MonkeyPatch.context() as monkeypatch:
+        if model_dir:
+            monkeypatch.setattr(inference_server, "_MODEL_DIR", str(model_dir))
+        response = client().post("/invocations", **kwargs)
+
     assert response.status_code == 200
     return response
 

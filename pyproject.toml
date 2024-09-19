@@ -67,6 +67,7 @@ dependencies = [
 [project.optional-dependencies]
 
 docs = [
+    "pytest",  # Because we import this in inference_server.testing
     "sphinx",
     "sphinx-rtd-theme",
 ]
@@ -81,6 +82,7 @@ linting = [
     "isort",
     "mypy",
     "pre-commit",
+    "pytest",  # Because we import this in inference_server.testing
 ]
 
 
