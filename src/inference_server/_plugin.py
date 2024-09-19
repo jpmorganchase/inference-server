@@ -46,7 +46,8 @@ def model_fn(model_dir: str) -> ModelType:
     This function will be called when the server starts up. Here, ``ModelType`` can be any Python class corresponding to
     the model, for example :class:`sklearn.tree.DecisionTreeClassifier`.
 
-    :param model_dir: Local filesystem directory containing the model files
+    :param model_dir: Local filesystem directory containing the model files. This is always :file:`/opt/ml/model` when
+                      invoked by **inference-server**.
     """
     raise NotImplementedError
 
