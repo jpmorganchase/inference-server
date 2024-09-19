@@ -39,9 +39,9 @@ Here we can use any serializer compatible with :mod:`sagemaker.serializers` and 
 
 If no serializer or deserializer is configured, bytes data are passed through as is for both input and output.
 
-:func:`testing.predict` accepts a ``model_dir`` argument which can used to set the directory containing the model
-artifacts to be loaded. At runtime, this directory is always file:`/opt/ml/model`. For testing purposes however, we may
-want to create model artifacts on the fly, for example in a temporary directory using a Pytest fixture, like this::
+:func:`inference_server.testing.predict` accepts a ``model_dir`` argument which can used to set the directory containing
+the model artifacts to be loaded. At runtime, this directory is always :file:`/opt/ml/model`. In our tests, we may want
+to create model artifacts on the fly, for example in a temporary directory using a Pytest fixture, like this::
 
    import pathlib
 
