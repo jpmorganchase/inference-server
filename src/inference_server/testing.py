@@ -14,11 +14,13 @@ Functions for testing **inference-server** plugins
 """
 
 import io
+import pathlib
 from types import ModuleType
 from typing import Any, Callable, Optional, Protocol, Tuple, Type, Union
 
 import botocore.response  # type: ignore[import-untyped]
 import pluggy
+import pytest
 import werkzeug.test
 
 import inference_server
@@ -117,15 +119,20 @@ def client() -> werkzeug.test.Client:
     return werkzeug.test.Client(inference_server.create_app())
 
 
-def post_invocations(**kwargs) -> werkzeug.test.TestResponse:
+def post_invocations(*, model_dir: Optional[pathlib.Path] = None, **kwargs) -> werkzeug.test.TestResponse:
     """
     Send an HTTP POST request to ``/invocations`` using a test HTTP client and return the response
 
     This function should be used to verify an inference request using the full **inference-server** logic.
 
-    :param kwargs: Keyword arguments passed to :meth:`werkzeug.test.Client.post`
+    :param model_dir: Optional pass a custom model directory to load the model from. Default is :file:`/opt/ml/model/`.
+    :param kwargs:    Keyword arguments passed to :meth:`werkzeug.test.Client.post`
     """
-    response = client().post("/invocations", **kwargs)
+    with pytest.MonkeyPatch.context() as monkeypatch:
+        if model_dir:
+            monkeypatch.setattr(inference_server, "_MODEL_DIR", str(model_dir))
+        response = client().post("/invocations", **kwargs)
+
     assert response.status_code == 200
     return response
 

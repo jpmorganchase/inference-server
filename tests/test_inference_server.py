@@ -8,7 +8,7 @@
 # Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an
 # "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
 # specific language governing permissions and limitations under the License.
-
+import pathlib
 from typing import Tuple
 
 import botocore.response
@@ -20,6 +20,14 @@ import inference_server.testing
 
 def test_package_has_version():
     assert inference_server.__version__ is not None
+
+
+@pytest.fixture(autouse=True)
+def reset_caches():
+    try:
+        yield
+    finally:
+        inference_server._model.cache_clear()
 
 
 @pytest.fixture
@@ -44,6 +52,26 @@ def bad_ping():
         yield
     finally:
         pm.unregister(PingPlugin)
+
+
+@pytest.fixture
+def model_using_dir():
+    class ModelPlugin:
+        """Plugin which just defines a model_fn"""
+
+        @staticmethod
+        @inference_server.plugin_hook()
+        def model_fn(model_dir: str):
+            """Model function for testing we are passing a custom directory"""
+            assert model_dir != "/opt/ml/model"
+            return lambda data: data
+
+    pm = inference_server.testing.plugin_manager()
+    pm.register(ModelPlugin)
+    try:
+        yield
+    finally:
+        pm.unregister(ModelPlugin)
 
 
 def test_version():
@@ -76,6 +104,18 @@ def test_invocations():
     """Test the default plugin (which passes through any input bytes) using low-level testing.post_invocations"""
     data = b"What's the shipping forecast for tomorrow"
     response = inference_server.testing.post_invocations(data=data, headers={"Accept": "application/octet-stream"})
+    assert response.data == data
+    assert response.headers["Content-Type"] == "application/octet-stream"
+
+
+def test_invocations_custom_model_dir(model_using_dir):
+    """Test the default plugin (which passes through any input bytes) using low-level testing.post_invocations"""
+    data = b"What's the shipping forecast for tomorrow"
+    model_dir = pathlib.Path(__file__).parent
+
+    response = inference_server.testing.post_invocations(
+        data=data, model_dir=model_dir, headers={"Accept": "application/octet-stream"}
+    )
     assert response.data == data
     assert response.headers["Content-Type"] == "application/octet-stream"
 
