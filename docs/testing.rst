@@ -39,6 +39,20 @@ Here we can use any serializer compatible with :mod:`sagemaker.serializers` and 
 
 If no serializer or deserializer is configured, bytes data are passed through as is for both input and output.
 
+:func:`testing.predict` accepts a ``model_dir`` argument which can used to set the directory containing the model
+artifacts to be loaded. At runtime, this directory is always file:`/opt/ml/model`. For testing purposes however, we may
+want to create model artifacts on the fly, for example in a temporary directory using a Pytest fixture, like this::
+
+   import pathlib
+
+   @pytest.fixture
+   def model_artifacts_dir(tmp_path) -> pathlib.Path:
+       dir_ = tmp_path / "model"
+       dir_.mkdir()
+       # instantiate a model object and serialize as 1 or more files to the directory
+       ...
+       return dir_
+
 
 Testing model predictions (low-level API)
 -----------------------------------------
@@ -61,7 +75,6 @@ Instead of using the high-level testing API, we can also use invoke requests sim
        )
        assert response.content_type == "application/json"
        assert response.json() == expected_prediction
-
 
 
 Verifying plugin registration
