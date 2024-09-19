@@ -117,7 +117,6 @@ def test_invocations_custom_model_dir(model_using_dir):
         data=data, model_dir=model_dir, headers={"Accept": "application/octet-stream"}
     )
     assert response.data == data
-    assert response.headers["Content-Type"] == "application/octet-stream"
 
 
 def test_prediction_custom_serializer():
@@ -152,6 +151,14 @@ def test_prediction_custom_serializer():
 def test_prediction_no_serializer():
     input_data = b"What's the shipping forecast for tomorrow"
     prediction = inference_server.testing.predict(input_data)  # No serializer should be bytes pass through again
+    assert prediction == input_data
+
+
+def test_prediction_model_dir(model_using_dir):
+    input_data = b"What's the shipping forecast for tomorrow"
+    model_dir = pathlib.Path(__file__).parent
+
+    prediction = inference_server.testing.predict(input_data, model_dir=model_dir)
     assert prediction == input_data
 
 

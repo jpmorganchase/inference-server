@@ -81,12 +81,18 @@ class _PassThroughDeserializer:
 
 
 def predict(
-    data: Any, serializer: Optional[ImplementsSerialize] = None, deserializer: Optional[ImplementsDeserialize] = None
+    data: Any,
+    *,
+    model_dir: Optional[pathlib.Path] = None,
+    serializer: Optional[ImplementsSerialize] = None,
+    deserializer: Optional[ImplementsDeserialize] = None,
 ) -> Any:
     """
     Invoke the model and return a prediction
 
     :param data:         Model input data
+    :param model_dir:    Optional pass a custom model directory to load the model from. Default is
+                         :file:`/opt/ml/model/`.
     :param serializer:   Optional. A serializer for sending the data as bytes to the model server. Should be compatible
                          with :class:`sagemaker.serializers.BaseSerializer`. Default: bytes pass-through.
     :param deserializer: Optional. A deserializer for processing the prediction as sent by the model server. Should be
@@ -100,7 +106,7 @@ def predict(
         "Content-Type": serializer.CONTENT_TYPE,  # The serializer declares the content-type of the input data
         "Accept": ", ".join(deserializer.ACCEPT),  # The deserializer dictates the content-type of the prediction
     }
-    prediction_response = post_invocations(data=serialized_data, headers=http_headers)
+    prediction_response = post_invocations(model_dir=model_dir, data=serialized_data, headers=http_headers)
     prediction_stream = botocore.response.StreamingBody(
         raw_stream=io.BytesIO(prediction_response.data),
         content_length=prediction_response.content_length,
