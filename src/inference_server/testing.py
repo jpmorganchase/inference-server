@@ -134,6 +134,7 @@ def post_invocations(*, model_dir: Optional[pathlib.Path] = None, **kwargs) -> w
     :param model_dir: Optional pass a custom model directory to load the model from. Default is :file:`/opt/ml/model/`.
     :param kwargs:    Keyword arguments passed to :meth:`werkzeug.test.Client.post`
     """
+    # pytest should be available when we are using inference_server.testing
     with pytest.MonkeyPatch.context() as monkeypatch:
         if model_dir:
             monkeypatch.setattr(inference_server, "_MODEL_DIR", str(model_dir))
