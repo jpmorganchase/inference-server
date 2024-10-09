@@ -48,7 +48,6 @@ requires-python = ">=3.8"
 dependencies = [
     "botocore",
     "codetiming~=1.4",
-    "importlib-metadata<4; python_version<'3.8'",
     "orjson~=3.0",
     "pluggy~=1.0",
     "werkzeug~=2.0",
@@ -67,6 +66,7 @@ dependencies = [
 [project.optional-dependencies]
 
 docs = [
+    "pytest",  # Because we import this in inference_server.testing
     "sphinx",
     "sphinx-rtd-theme",
 ]
@@ -81,6 +81,7 @@ linting = [
     "isort",
     "mypy",
     "pre-commit",
+    "pytest",  # Because we import this in inference_server.testing
 ]
 
 

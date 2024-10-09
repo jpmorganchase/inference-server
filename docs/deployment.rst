@@ -18,6 +18,7 @@ like this:
    COPY entrypoint.sh /usr/local/bin/
    RUN python -m pip install \
        gunicorn  \
+       inference-server  \
        shipping-forecast  # Our package implementing the hooks
 
    EXPOSE 8080
