@@ -19,6 +19,8 @@ Using package managers like Conda or Mamba:
 conda install conda-forge::inference-server
 ```
 
+See <https://github.com/conda-forge/inference-server-feedstock> for details.
+
 
 ## Developing
 
