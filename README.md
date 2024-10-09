@@ -7,9 +7,20 @@ Deploy your AI/ML model to Amazon SageMaker for Real-Time Inference and Batch Tr
 
 ## Installing
 
+Using package managers like Pip or Poetry:
+
 ```shell
 python -m pip install inference-server
 ```
+
+Using package managers like Conda or Mamba:
+
+```shell
+conda install conda-forge::inference-server
+```
+
+See <https://github.com/conda-forge/inference-server-feedstock> for details.
+
 
 ## Developing
 
