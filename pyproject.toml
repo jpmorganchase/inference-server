@@ -50,7 +50,7 @@ dependencies = [
     "codetiming~=1.4",
     "orjson~=3.0",
     "pluggy~=1.0",
-    "werkzeug~=2.0",
+    "werkzeug~=3.0",
 ]
 
 
